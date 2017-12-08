@@ -1,199 +1,596 @@
 package com.example.asus.herb4health;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Rect;
-import android.net.Uri;
-import android.provider.Settings;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Bundle;
+
+import com.example.asus.herb4health.util.HelperView;
 
 
-import com.bumptech.glide.Glide;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.fitness.request.StartBleScanRequest;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, GestureDetector.OnGestureListener {
 
-import java.util.ArrayList;
-import java.util.List;
+    Context mContext = MainActivity.this;
 
-public class MainActivity extends AppCompatActivity {
+    private LinearLayout tilesContainer;
+    private ScrollView mainScrollView;
+    public MediaPlayer mp3;
 
-    private RecyclerView recyclerView;
-    private AlbumsAdapter adapter;
-    private List<Album> albumList;
+
+    private int[] colors = new int[5];
+
+    private int ANIMATION_DURATION = 300; //in milliseconds
+    private int firstChildHeight;
+    private int defaultChildHeight;
+
+    private boolean toAnimate = true;
+    private boolean toFantasticScroll = true;
+
+    private GestureDetectorCompat detector;
+    private Toolbar appBar;
+
+    NavigationView navigationView;
+
+    private String[] messages = {
+            "คลังสมุนไพร",
+            "กลุ่มอาการและโรค",
+            "ร่างกายกับอาการ",
+            "แบบฝึกหัด",
+            "อาหารเพื่อสุขภาพ",
+            "About us"
+    };
+
+    private String[] tagLines = {
+            "รวมข้อมูลชื่อสรรพคุณทางยาและวิธีใช้สมุนไพรหลายชนิด",
+            "กลุ่มอาการและโรคที่พบเจอได้บ่อย",
+            "ผู้ใช้สามารถกดไปบนหุ่นจำลองเพื่อดูอาการได้ตามส่วนของอวัยวะต่างๆในร่างกาย",
+            "เพื่อทดสอบความรู้ความเข้าใจเกี่ยวกับสมุนไพรผู้ใช้สามารถเล่นเกมส์เพื่อทบทวนความจำได้", "รวบรวมข้อมูลอาหารเพื่อสุขภาพ","รวมคำถามที่พบบ่อยและอีเมล์ืที่สามารถติดต่อเราได้"
+    };
+
+    DrawerLayout mDrawerLayout;
+    ActionBarDrawerToggle mDrawerToggle;
+    private HerbFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        initCollapsingToolbar();
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-
-        albumList = new ArrayList<>();
-        adapter = new AlbumsAdapter(this, albumList);
-
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapter);
-
-        prepareAlbums();
-
-        try {
-            Glide.with(this).load(R.drawable.cover).into((ImageView) findViewById(R.id.backdrop2));
-        } catch (Exception e) {
-            e.printStackTrace();
+        appBar = (Toolbar) findViewById(R.id.landingPageAppBar);
+        setSupportActionBar(appBar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("");
         }
-    }
 
-    /**
-     * Initializing collapsing toolbar
-     * Will show and hide the toolbar title on scroll
-     */
-    private void initCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(" ");
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        appBarLayout.setExpanded(true);
+        setUpNavigationDrawer();
 
-        // hiding & showing the title when toolbar expanded & collapsed
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow = false;
-            int scrollRange = -1;
+        detector = new GestureDetectorCompat(this, this);
+        int displayHeight = getWindowManager().getDefaultDisplay().getHeight();
+        firstChildHeight = (displayHeight * 60) / 100; //first tile should cover 60% of height
+        defaultChildHeight = displayHeight / 6;
 
+        tilesContainer = (LinearLayout) findViewById(R.id.tileContainer);
+
+        mainScrollView = (ScrollView) findViewById(R.id.mainScrollView);
+        mainScrollView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(getString(R.string.app_name));
-                    isShow = true;
-                } else if (isShow) {
-                    collapsingToolbar.setTitle(" ");
-                    isShow = false;
-                }
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
             }
         });
+
+        addTilesToContainer();
     }
 
-    /**
-     * Adding few albums for testing
-     */
-    private void prepareAlbums() {
-        int[] covers = new int[]{
-                R.drawable.album1,
-                R.drawable.album2,
-                R.drawable.album3,
-                R.drawable.album4,
-                R.drawable.album5,
-                R.drawable.album6,
-                R.drawable.album7,
-                R.drawable.album8,
-                R.drawable.album9,
-                R.drawable.album10,
-                R.drawable.album11};
-
-        Album a = new Album("Maroon5", 13, covers[0]);
-        albumList.add(a);
-
-        a = new Album("Sugar Ray", 8, covers[1]);
-        albumList.add(a);
-
-        a = new Album("Bon Jovi", 11, covers[2]);
-        albumList.add(a);
-
-        a = new Album("The Corrs", 12, covers[3]);
-        albumList.add(a);
-
-        a = new Album("The Cranberries", 14, covers[4]);
-        albumList.add(a);
-
-        a = new Album("Westlife", 1, covers[5]);
-        albumList.add(a);
-
-        a = new Album("Black Eyed Peas", 11, covers[6]);
-        albumList.add(a);
-
-        a = new Album("VivaLaVida", 14, covers[7]);
-        albumList.add(a);
-
-        a = new Album("The Cardigans", 11, covers[8]);
-        albumList.add(a);
-
-        a = new Album("Pussycat Dolls", 17, covers[9]);
-        albumList.add(a);
-
-        adapter.notifyDataSetChanged();
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (toFantasticScroll) {
+            detector.onTouchEvent(ev);
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
-    /**
-     * RecyclerView item decoration - give equal margin around grid item
-     */
-    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+    public void addTilesToContainer() {
 
-        private int spanCount;
-        private int spacing;
-        private boolean includeEdge;
+        View tileView;
 
-        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
-            this.spanCount = spanCount;
-            this.spacing = spacing;
-            this.includeEdge = includeEdge;
+        int[] images = {
+                R.drawable.herbs9,
+                R.drawable.disert,
+                R.drawable.hert2,
+                R.drawable.exercise,
+                R.drawable.food_bg1,
+                R.drawable.ab
+        };
+
+        int numberOfTiles = 6;
+        for (int i = 0; i < numberOfTiles; i++) {
+            if (i == 0) {
+                tileView = LayoutInflater.from(mContext).inflate(R.layout.content_fragment, null);
+                tileView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        firstChildHeight));
+                tileView.setTag("tile - " + messages[i]);
+                tileView.setOnClickListener(this);
+
+                ImageView imageView = (ImageView) tileView.findViewById(R.id.ivBackground);
+                imageView.setImageResource(images[i]);
+                tileView.setOnClickListener(this);
+
+                Button button = (Button) tileView.findViewById(R.id.btnTileMessage);
+                button.setText(messages[i]);
+                button.setTag(i);
+                button.setOnClickListener(this);
+
+                TextView tagLine = (TextView) tileView.findViewById(R.id.tvTileTagLine);
+                tagLine.setText(tagLines[i]);
+
+                tilesContainer.addView(tileView);
+            } else {
+                tileView = LayoutInflater.from(mContext).inflate(R.layout.content_fragment, null);
+                tileView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        defaultChildHeight));
+                tileView.setTag("tile - " + messages[i]);
+                tileView.setOnClickListener(this);
+
+                ImageView imageView = (ImageView) tileView.findViewById(R.id.ivBackground);
+                imageView.setImageResource(images[i]);
+                tileView.setOnClickListener(this);
+
+                Button button = (Button) tileView.findViewById(R.id.btnTileMessage);
+                button.setText(messages[i]);
+                button.setTag(i);
+                button.setOnClickListener(this);
+
+                TextView tagLine = (TextView) tileView.findViewById(R.id.tvTileTagLine);
+                tagLine.setText(tagLines[i]);
+                tagLine.setVisibility(View.INVISIBLE);
+
+                tilesContainer.addView(tileView);
+            }
         }
 
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
+        HelperView.setPrecedingView(null);
+        HelperView.setCurrentView(tilesContainer.getChildAt(0));
+        HelperView.getCurrentView().findViewById(R.id.tvTileTagLine).setVisibility(View.VISIBLE);
+        HelperView.setFollowingView(tilesContainer.getChildAt(1));
 
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+    }
 
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
-                }
-                outRect.bottom = spacing; // item bottom
+    private void addFragmentToScreen(Fragment fragment) {
+        Toast.makeText(this, "ยินดีต้องรับสู่คลังสมุนไพร", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(MainActivity.this, FetchImageFirebase.class);
+        startActivity(i);
+
+    }
+
+    @Override
+    public void onClick(final View v) {
+
+        if (v.getTag().toString().contains("tile")) {
+            if (v.getLayoutParams().height != firstChildHeight) {
+                expandView(v);
             } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
+                switch (tilesContainer.indexOfChild(v)) {
+                    case 0:
+                        if (tilesContainer.getChildAt(0).getLayoutParams().height != firstChildHeight) {
+                            downToUpScroll(HelperView.getCurrentView(), HelperView.getFollowingView());
+                        }
+                        //กดรูปภาพแล้ว intent ไปอีกหน้า ภาพ 1
+
+                        else {
+                            isFragmentOpened = true;
+                            fragment = (HerbFragment) Fragment.instantiate(this, HerbFragment.class.getName());
+                            addFragmentToScreen(fragment);
+                        }
+                        break;
+
+                    case 1:
+                        if (tilesContainer.getChildAt(1).getLayoutParams().height != firstChildHeight) {
+                            downToUpScroll(HelperView.getCurrentView(), HelperView.getFollowingView());
+                        }
+                        //กดรูปภาพแล้ว intent ไปอีกหน้า ภาพ 2
+
+                        break;
+
+                    case 2:
+                        if (tilesContainer.getChildAt(2).getLayoutParams().height != firstChildHeight) {
+                            downToUpScroll(HelperView.getCurrentView(), HelperView.getFollowingView());
+                        }
+                        break;
+
+                    case 3:
+                        if (tilesContainer.getChildAt(3).getLayoutParams().height != firstChildHeight) {
+                            downToUpScroll(HelperView.getCurrentView(), HelperView.getFollowingView());
+                        }
+
+                        break;
+
+                    case 4:
+                        break;
+
+                    case 5:
+                        break;
                 }
+            }
+        }
+
+        switch (v.getTag().toString()) {
+            case "0":
+
+                Toast.makeText(this, "ยินดีต้องรับสู่คลังสมุนไพร", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(MainActivity.this, FetchImageFirebase.class);
+                startActivity(i);
+
+
+
+
+                break;
+
+            case "1":
+
+                Toast.makeText(this, "ยินดีต้องรับสู่กลุ่มอาการและโรค", Toast.LENGTH_SHORT).show();
+                Intent a = new Intent(this, Newlist.class);
+                startActivity(a);
+                if (tilesContainer.getChildAt(1).getLayoutParams().height != firstChildHeight) {
+                    downToUpScroll(HelperView.getCurrentView(), HelperView.getFollowingView());
+                }
+
+
+
+
+                break;
+
+            case "2":
+
+
+                Toast.makeText(this, "ยินดีต้องรับสู่หุ่นจำลองร่างกาย", Toast.LENGTH_SHORT).show();
+                Intent b = new Intent(this, bodyhumenActivity.class);
+                startActivity(b);
+                if (tilesContainer.getChildAt(2).getLayoutParams().height != firstChildHeight) {
+                    downToUpScroll(HelperView.getCurrentView(), HelperView.getFollowingView());
+
+                }
+
+
+
+                break;
+
+            case "3":
+                Toast.makeText(this, "ยินดีต้องรับสู่แบบฝึกหัด", Toast.LENGTH_SHORT).show();
+                Intent c = new Intent(this, Cardview_main.class);
+
+                startActivity(c);
+                //music
+
+                MediaPlayer mp3 = MediaPlayer.create(getApplicationContext(), R.raw.thaimusic);
+                mp3.start();
+
+
+                break;
+
+            case "4":
+                Toast.makeText(this, "ยินดีต้องรับสู่ อาหารเพื่อสุขภาพ", Toast.LENGTH_SHORT).show();
+                Intent d = new Intent(this, CoverFlowMain.class);
+
+                startActivity(d);
+
+                break;
+
+
+            case "5":
+                Toast.makeText(this, "ยินดีต้องรับสู่ ABout us", Toast.LENGTH_SHORT).show();
+
+
+                break;
+        }
+    }
+
+    public void expandView(final View view) {
+        int currentScrollPosition = mainScrollView.getScrollY();
+        int finalScrollPosition = view.getTop();
+
+        ValueAnimator scrollAnimator = ValueAnimator.ofInt(currentScrollPosition, finalScrollPosition);
+        scrollAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int amount = (int) animation.getAnimatedValue();
+                mainScrollView.scrollTo(0, amount);
+            }
+        });
+        scrollAnimator.setDuration(ANIMATION_DURATION);
+
+        ValueAnimator heightAnimator = ValueAnimator.ofInt(view.getHeight(), firstChildHeight);
+        heightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int height = (int) animation.getAnimatedValue();
+                view.getLayoutParams().height = height;
+                view.requestLayout();
+            }
+        });
+        heightAnimator.setDuration(ANIMATION_DURATION);
+
+        scrollAnimator.start();
+        heightAnimator.start();
+
+        if (tilesContainer.indexOfChild(view) == 0) {
+            //do nothing
+        } else {
+            HelperView.setPrecedingView(tilesContainer.getChildAt(tilesContainer.indexOfChild(view) - 1));
+        }
+        HelperView.setCurrentView(view);
+        HelperView.setFollowingView(tilesContainer.getChildAt(tilesContainer.indexOfChild(view) + 1));
+        HelperView.getCurrentView().findViewById(R.id.tvTileTagLine).setVisibility(View.VISIBLE);
+        if (tilesContainer.indexOfChild(view) < 4) {
+            HelperView.getFollowingView().findViewById(R.id.tvTileTagLine).setVisibility(View.INVISIBLE);
+        }
+    }
+
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        //return true because every gesture start with onDown
+        return true;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+        final int SWIPE_MIN_DISTANCE = 50;
+        final int SWIPE_THRESHOLD_VELOCITY = 200;
+
+        if (e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE &&
+                Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+            //Toast.makeText(this, "Bottom to top", Toast.LENGTH_SHORT).show();
+            if (HelperView.getFollowingView() != null) {
+                downToUpScroll(HelperView.getCurrentView(), HelperView.getFollowingView());
+            }
+            //From Bottom to top
+            return true;
+        } else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE &&
+                Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+            //Toast.makeText(this, "top to Bottom", Toast.LENGTH_SHORT).show();
+            if (HelperView.getPrecedingView() != null) {
+                upToDownScroll(HelperView.getPrecedingView(), HelperView.getCurrentView());
+            }
+            //From top to Bottom
+            return true;
+        }
+
+        return true;
+    }
+
+    public void upToDownScroll(final View precedingView, final View currentView) {
+
+        if (toAnimate) {
+
+            toAnimate = false;
+
+            if (tilesContainer.indexOfChild(currentView) == 0) {
+                //do-nothing
+            } else {
+                int currentScrollPosition = mainScrollView.getScrollY();
+                int toScrollPosition = precedingView.getTop();
+
+                ValueAnimator scrollAnimator = ValueAnimator.ofInt(currentScrollPosition, toScrollPosition);
+                scrollAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int amount = (int) animation.getAnimatedValue();
+                        mainScrollView.scrollTo(0, amount);
+                    }
+                });
+                scrollAnimator.setDuration(ANIMATION_DURATION);
+
+                ValueAnimator heightAnimator = ValueAnimator.ofInt(currentView.getLayoutParams().height, defaultChildHeight);
+                heightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        int height = (int) animation.getAnimatedValue();
+                        currentView.getLayoutParams().height = height;
+                        currentView.requestLayout();
+                    }
+                });
+                heightAnimator.setDuration(ANIMATION_DURATION);
+
+                scrollAnimator.start();
+                heightAnimator.start();
+
+                HelperView.setCurrentView(precedingView);
+                HelperView.setPrecedingView(tilesContainer.getChildAt(tilesContainer.indexOfChild(precedingView) - 1));
+                HelperView.setFollowingView(currentView);
+                HelperView.getCurrentView().findViewById(R.id.tvTileTagLine).setVisibility(View.VISIBLE);
+                HelperView.getFollowingView().findViewById(R.id.tvTileTagLine).setVisibility(View.INVISIBLE);
+
+                scrollAnimator.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                        toAnimate = false;
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        toAnimate = true;
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
             }
         }
     }
 
-    /**
-     * Converting dp to pixel
-     */
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+    public void downToUpScroll(View currentView, final View followingView) {
+
+        if (toAnimate) {
+
+            toAnimate = false;
+
+            int currentScrollPosition = mainScrollView.getScrollY();
+            int toScrollPosition = followingView.getTop();
+
+            ValueAnimator scrollAnimator = ValueAnimator.ofInt(currentScrollPosition, toScrollPosition);
+            scrollAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    int amount = (int) animation.getAnimatedValue();
+                    mainScrollView.scrollTo(0, amount);
+                }
+            });
+            scrollAnimator.setDuration(ANIMATION_DURATION);
+
+            ValueAnimator heightAnimator = ValueAnimator.ofInt(followingView.getHeight(), firstChildHeight);
+            heightAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    int height = (int) animation.getAnimatedValue();
+                    followingView.getLayoutParams().height = height;
+                    followingView.requestLayout();
+                }
+            });
+            heightAnimator.setDuration(ANIMATION_DURATION);
+
+            scrollAnimator.start();
+            heightAnimator.start();
+
+            scrollAnimator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    toAnimate = true;
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+
+            HelperView.setPrecedingView(currentView);
+            HelperView.setCurrentView(followingView);
+            HelperView.setFollowingView(tilesContainer.getChildAt(tilesContainer.indexOfChild(followingView) + 1));
+            HelperView.getCurrentView().findViewById(R.id.tvTileTagLine).setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void setUpNavigationDrawer() {
+
+        navigationView = (NavigationView) findViewById(R.id.fragmentDrawer);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.mainDrawerLayout);
+        mDrawerToggle = new ActionBarDrawerToggle(this,
+                mDrawerLayout,
+                appBar,
+                R.string.open,
+                R.string.close) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+
+                toFantasticScroll = true;
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                toFantasticScroll = false;
+            }
+        };
+
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+    }
+
+    boolean isFragmentOpened = false;
+
+
+    //Detect Back Button
+    @Override
+    public void onBackPressed() {
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+
+        alertDialog.setTitle("คุณต้องการจะออกจากระบบใช่หรือไม่");
+
+        alertDialog.setPositiveButton("ใช่",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //คลิกใช่ ออกจากโปรแกรม
+                        finish();
+                        MainActivity.super.onBackPressed();
+
+                    }
+                });
+
+        alertDialog.setNegativeButton("ไม่",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //คลิกไม่ cancel dialog
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+
     }
 
 }

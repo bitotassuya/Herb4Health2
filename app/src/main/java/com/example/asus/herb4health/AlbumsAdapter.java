@@ -1,6 +1,13 @@
 package com.example.asus.herb4health;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.sax.StartElementListener;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +30,13 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
 
     private Context mContext;
     private List<Album> albumList;
+    private MediaPlayer mediaPlayer;
+
+
+
+    private RecyclerView mRecyclerView;
+
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView title, count;
@@ -30,10 +44,13 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
 
         public MyViewHolder(View view) {
             super(view);
+            mContext = view.getContext();
             title = (TextView) view.findViewById(R.id.title);
             count = (TextView) view.findViewById(R.id.count);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             overflow = (ImageView) view.findViewById(R.id.overflow);
+
+
         }
     }
 
@@ -48,14 +65,17 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.album_card, parent, false);
 
+
         return new MyViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
-        Album album = albumList.get(position);
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+        final Album album = albumList.get(position);
+
+
         holder.title.setText(album.getName());
-        holder.count.setText(album.getNumOfSongs() + " songs");
+        holder.count.setText(album.getNumOfSongs() + " ชุด");
 
         // loading album cover using Glide library
         Glide.with(mContext).load(album.getThumbnail()).into(holder.thumbnail);
@@ -64,6 +84,29 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
             @Override
             public void onClick(View view) {
                 showPopupMenu(holder.overflow);
+            }
+        });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (album.getName().toString().equals("แบบฝึกหัดถามตอบ"))
+                {
+                    Intent intent = new Intent(mContext, quiz.class);
+                    mContext.startActivity(intent);
+                    //Toast.makeText(getClass(quiz.class), "This is my Toast message!",Toast.LENGTH_LONG).show();
+
+
+
+                } else if (album.getName().toString().equals("ทายศัพท์จากภาพ")) {
+                    Intent intent1 = new Intent(mContext, LogoMain.class);
+                    mContext.startActivity(intent1);
+
+                } else if (album.getName().toString().equals("ใช้เสียงทายภาพ")) {
+                    Intent intent1 = new Intent(mContext, Opengame.class);
+                    mContext.startActivity(intent1);
+
+
+                }
             }
         });
     }
@@ -94,6 +137,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
                 case R.id.action_add_favourite:
                     Toast.makeText(mContext, "Add to favourite", Toast.LENGTH_SHORT).show();
                     return true;
+
                 case R.id.action_play_next:
                     Toast.makeText(mContext, "Play next", Toast.LENGTH_SHORT).show();
                     return true;
@@ -107,4 +151,8 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.MyViewHold
     public int getItemCount() {
         return albumList.size();
     }
+
+
+
+
 }

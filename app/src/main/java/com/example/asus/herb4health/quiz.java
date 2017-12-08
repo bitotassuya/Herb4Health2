@@ -77,6 +77,8 @@ public class quiz extends AppCompatActivity {
     }
 
     public void onClick(View view) {
+        Snackbar snackbar = Snackbar.make(view,"ยินดีเข้าสู่ทายคำศัพท์จากภาก",Snackbar.LENGTH_LONG);
+        snackbar.show();
         //all logic for all answers buttons in one method
         Button answer = (Button) view;
         // if the answer is correct, increase the score
@@ -109,7 +111,7 @@ public class quiz extends AppCompatActivity {
 
     public void  onBackPressed(){
         AlertDialog.Builder dialog = new  AlertDialog.Builder(this);
-        dialog.setMessage("คุณจะออกจะแบบทดสอบหรือไม่ ?");
+        dialog.setMessage("คุณจะออกจะแบบฝึกหัดใช่หรือไม่หรือไม่ ?");
         dialog.setPositiveButton("ตกลง",new DialogInterface.OnClickListener()
         {
             @Override

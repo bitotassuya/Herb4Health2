@@ -34,7 +34,11 @@ public class Uploadimage extends AppCompatActivity {
     private DatabaseReference mDatabaseRef;
     private ImageView imgview;
     private EditText editext;
+    private EditText editext1;
+
     private EditText editTextopt;
+    private EditText editTextopt1;
+    private EditText editTextopt2;
     private Uri imgUrl;
 
     public static final String STORAGE_URL = "สมุนไพร/";
@@ -51,7 +55,11 @@ public class Uploadimage extends AppCompatActivity {
 
         imgview =(ImageView) findViewById(R.id.image_View);
         editext = (EditText) findViewById(R.id.txtImageName);
+        editext1 = (EditText) findViewById(R.id.txtImageName2);
+
         editTextopt = (EditText) findViewById(R.id.txtImageoption);
+        editTextopt1 = (EditText) findViewById(R.id.txtImageoption1);
+        editTextopt2 = (EditText) findViewById(R.id.txtImageoption2);
 
 
     }
@@ -89,11 +97,11 @@ public class Uploadimage extends AppCompatActivity {
     }
     public void btnUpload_Click(View v){
         if(imgUrl != null){
-          final  ProgressDialog dialog =  new ProgressDialog(this);
+          final ProgressDialog dialog =  new ProgressDialog(this);
             dialog.setTitle("Uploading image");
             dialog.show();
 
-            StorageReference ref = mStorageRef.child(STORAGE_URL+System.currentTimeMillis()+"."+getImagetxt(imgUrl));
+            StorageReference ref = mStorageRef.child(STORAGE_URL+ System.currentTimeMillis()+"."+getImagetxt(imgUrl));
 
             ref.putFile(imgUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @SuppressWarnings("VisibleForTests")
@@ -101,8 +109,8 @@ public class Uploadimage extends AppCompatActivity {
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
                     dialog.dismiss();
-                    Toast.makeText(getApplicationContext(),"Inmage Uploaded",Toast.LENGTH_SHORT).show();
-                    ImageUploadConfig imgup = new ImageUploadConfig(editext.getText().toString(),taskSnapshot.getDownloadUrl().toString(),editTextopt.getText().toString());
+                    Toast.makeText(getApplicationContext(),"Inmage Uploaded", Toast.LENGTH_SHORT).show();
+                    ImageUploadConfig imgup = new ImageUploadConfig(editext.getText().toString(),editext1.getText().toString(),taskSnapshot.getDownloadUrl().toString(),editTextopt.getText().toString(),editTextopt1.getText().toString(),editTextopt2.getText().toString());
 
 
                     String uploadedid = mDatabaseRef.push().getKey();
@@ -116,7 +124,7 @@ public class Uploadimage extends AppCompatActivity {
                         public void onFailure(@NonNull Exception e) {
 
                             dialog.dismiss();
-                            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
 
 
                         }
@@ -131,7 +139,7 @@ public class Uploadimage extends AppCompatActivity {
                     });
         }
         else
-            Toast.makeText(getApplicationContext(),"please select image",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"please select image", Toast.LENGTH_SHORT).show();
 
 
     }
