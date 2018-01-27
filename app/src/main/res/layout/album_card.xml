@@ -26,17 +26,20 @@
 
             <TextView
                 android:id="@+id/title"
+                android:background="#002419"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/thumbnail"
                 android:paddingLeft="@dimen/album_title_padding"
                 android:paddingRight="@dimen/album_title_padding"
                 android:paddingTop="@dimen/album_title_padding"
-                android:textColor="@color/album_title"
+                android:textColor="#48a999"
                 android:textSize="@dimen/album_title" />
 
             <TextView
                 android:id="@+id/count"
+                android:background="#002419"
+                android:textColor="#FFFFFF"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/title"

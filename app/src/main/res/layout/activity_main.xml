@@ -25,24 +25,10 @@
                 android:paddingBottom="500dp" />
         </ScrollView>
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/landingPageAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-        <FrameLayout android:id="@+id/frame_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+
+
     </RelativeLayout>
 
-    <android.support.design.widget.NavigationView android:id="@+id/fragmentDrawer"
-        android:layout_width="280dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:itemIconTint="#212121"
-        app:itemTextColor="#212121"
-        app:menu="@menu/navigation_drawer_menu"/>
+
 </android.support.v4.widget.DrawerLayout>

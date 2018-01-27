@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EFEBE9"
+    android:background="#002419"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
-    tools:context="com.example.asus.herb4health.highest_score">
+    tools:context="com.example.asus.herbs4health.highest_score">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
             android:id="@+id/textScore"
             android:layout_width="500dp"
             android:layout_height="wrap_content"
-            android:background="@color/Brown6"
+            android:background="#004c3f"
             android:padding="@dimen/activity_vertical_margin"
             android:text="คะแนนของคุณ:"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
@@ -33,7 +33,7 @@
             android:id="@+id/textHighScore"
             android:layout_width="500dp"
             android:layout_height="wrap_content"
-            android:background="@color/Brown10"
+            android:background="#38786a"
             android:padding="@dimen/activity_vertical_margin"
             android:text="คะแนะสูงสุด:"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"

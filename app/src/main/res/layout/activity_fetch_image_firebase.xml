@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EFEBE9"
+    android:background="#E0F2F1"
     android:orientation="vertical">
 
     //ส่วนที่เพิ่มเติมที่1
@@ -17,6 +17,7 @@
         ></android.support.v7.widget.SearchView>
 
     <android.support.v7.widget.RecyclerView
+        android:background="#004c3f"
         android:id="@+id/myRecycler1"
         class="android.support.v7.widget.RecyclerView"
         android:layout_width="match_parent"

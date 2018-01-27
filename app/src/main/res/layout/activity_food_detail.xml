@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.asus.herb4health.FoodDetail">
+    android:background="#38786a"
+    tools:context="com.example.asus.herbs4health.FoodDetail">
 
     <com.github.florent37.diagonallayout.DiagonalLayout
         android:id="@+id/diagonalLayout"

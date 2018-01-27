@@ -2,8 +2,8 @@
     <string name="app_name">Herb4Health</string>
     <string name="title_activity_search">Search</string>
     <string name="action_settings">Settings</string>
-    <string name="action_add_favourite">Add to Favourites</string>
-    <string name="action_play_next">Play Next</string>
+    <string name="action_add_favourite">ชอบ</string>
+    <string name="action_play_next">ไม่ชอบ</string>
     <string name="backdrop_title">แบบฝึกหัด</string>
     <string name="backdrop_subtitle">รวบรวมแบบฝึกหัดสนุกๆไว้มากมาย</string>
 
@@ -58,5 +58,10 @@
     <string name="i18">ชา</string>
     <string name="i19">มะเขือเทศ</string>
     <string name="i20">ขิง</string>
+    <string name="placeholder_lorem_ipsum">Lorem ipsum dolor set it</string>
+    <color name="accent">#FF4081</color>
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#727272</color>
+    <color name="divider">#B6B6B6</color>
 
 </resources>

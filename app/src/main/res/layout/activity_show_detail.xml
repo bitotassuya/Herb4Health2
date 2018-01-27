@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3E2723"
+    android:background="#38786a"
     android:orientation="vertical"
-    tools:context="com.example.asus.herb4health.ShowDetail">
+    tools:context="com.example.asus.herbs4health.ShowDetail">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -22,11 +22,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
+
                 app:cardCornerRadius="10dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
                     <ImageView
                         android:id="@+id/image"
@@ -35,6 +36,7 @@
                         android:layout_margin="4dp"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
+                        android:background="#002419"
                         android:src="@drawable/disease2" />
 
                     <TextView
@@ -42,13 +44,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignBottom="@+id/image"
-                        android:background="#A1887F"
+                        android:background="#002419"
                         android:gravity="center"
+                        android:textColor="#FFFFFF"
                         android:text="TEST TEST TEST TEST"
                         android:textSize="26sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:textColor="#000000"
+                        android:background="#FFFFFF"
                         android:id="@+id/tvDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -58,6 +63,9 @@
                         android:textSize="16dp" />
                 </RelativeLayout>
             </android.support.v7.widget.CardView>
+
+
+
 
             <android.support.v7.widget.CardView
 
@@ -71,15 +79,17 @@
                     android:id="@+id/containerfunc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#3E2723"
+                    android:background="#48a999"
 
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:textSize="20dp"
-                        android:background="#A1887F"
-                        android:text="ตัวอย่างสมุนไพรและวิธีใช้"/>
+                        android:background="#002419"
+                        android:text="ตัวอย่างสมุนไพรและวิธีใช้"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20dp" />
 
                     <ImageView
                         android:id="@+id/herbimage"
@@ -96,9 +106,10 @@
 
                     <TextView
                         android:id="@+id/nameherb"
+                        android:textColor="#FFFFFF"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#A1887F"
+                        android:background="#002419"
                         android:gravity="center"
                         android:text="TEST TEST "
                         android:textSize="26sp" />
@@ -109,24 +120,45 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="18dp"
                         android:background="#FFFFFF"
+                        android:textColor="#000000"
 
                         android:text="TEST TEST TEST TEST TEST TEST TEST TEST"
                         android:textSize="16dp" />
-                    <Button
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:background="#795548"
-                        android:textColor="#FFFFFF"
-                        android:text="ศึกษาเพิ่มเติม"
-                        android:onClick="GoFirebase"
-                        />
+
                 </LinearLayout>
 
 
             </android.support.v7.widget.CardView>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:context=".ShowDetail">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:background="#FFFFFF"
+
+                    android:paddingBottom="8dp"
+                    android:paddingTop="8dp"/>
+
+            </RelativeLayout>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#000000"
+                android:gravity="center"
+                android:onClick="GoFirebase"
+                android:text="ศึกษาเพิ่มเติม"
+                android:textColor="#FFFFFF" />
+
 
         </LinearLayout>
 
+
+
     </ScrollView>
+
 </LinearLayout>

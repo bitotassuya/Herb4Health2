@@ -5,8 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
+    android:background="#002419"
     android:orientation="vertical"
-    tools:context="com.example.asus.herb4health.LogoMain">
+    tools:context="com.example.asus.herbs4health.LogoMain">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -25,6 +26,8 @@
             android:weightSum="1">
 
             <ImageView
+                android:layout_marginTop="15dp"
+                android:background="#FFFFFF"
                 android:id="@+id/imgLogo"
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
@@ -35,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
-
+                android:textColor="#FFFFFF"
                 android:text="ชื่อภาษาอังกฤษของสมุนไพรชนิดนี้คือ?"
                 android:textSize="18dp" />
 
@@ -68,7 +71,8 @@
 
 
             <Button
-
+                android:background="#FFFFFF"
+                android:textColor="#ffff00"
                 android:id="@+id/btnSubmit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,8 +91,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
                     android:layout_alignParentLeft="true"
-
-
+                    android:background="#38786a"
+                    android:textColor="#FFFFFF"
                     android:layout_marginLeft="240dp"
                     android:layout_marginStart="245dp"
                     android:layout_weight="0.40"
@@ -101,10 +105,9 @@
                     android:id="@+id/score_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
-
+                    android:textColor="#FFFFFF"
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="13dp"
                     android:layout_marginStart="13dp"
